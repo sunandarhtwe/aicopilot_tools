@@ -1,0 +1,20 @@
+{
+  "name": "dat-ai-testcase-copilot-bridge-v4",
+  "version": "4.0.0-copilot-bridge",
+  "description": "DAT AI Test Case Generator v4.0 (Copilot Bridge edition): uses the DAT Copilot Bridge VS Code extension (GitHub Copilot) instead of the OpenAI API, adds selectable Test Case Type (Integration/Unit/Comprehensive), duplicate removal, editable preview with Save/Cancel, plus the existing Document Classifier, Knowledge Base Cache, Coverage Engine, and Browser Close Cleanup.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2",
+    "mammoth": "^1.8.0",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.1",
+    "xlsx": "^0.18.5",
+    "jszip": "^3.10.1"
+  }
+}

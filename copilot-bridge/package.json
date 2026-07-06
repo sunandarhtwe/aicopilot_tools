@@ -1,0 +1,70 @@
+{
+  "name": "dat-copilot-bridge",
+  "displayName": "DAT Copilot Bridge",
+  "description": "Bridges the DAT AI Test Case Generator web tool to GitHub Copilot Chat, so QA testers without a GitHub Copilot API key can still use their VS Code Copilot subscription for AI test case generation.",
+  "version": "1.0.0",
+  "publisher": "dat-internal",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "datCopilotBridge.start",
+        "title": "DAT Copilot Bridge: Start Bridge Server"
+      },
+      {
+        "command": "datCopilotBridge.stop",
+        "title": "DAT Copilot Bridge: Stop Bridge Server"
+      },
+      {
+        "command": "datCopilotBridge.showStatus",
+        "title": "DAT Copilot Bridge: Show Status"
+      },
+      {
+        "command": "datCopilotBridge.listModels",
+        "title": "DAT Copilot Bridge: List Available Copilot Models"
+      }
+    ],
+    "configuration": {
+      "title": "DAT Copilot Bridge",
+      "properties": {
+        "datCopilotBridge.port": {
+          "type": "number",
+          "default": 4321,
+          "description": "Local port the bridge HTTP server listens on. Must match COPILOT_BRIDGE_URL in the DAT AI Test Case Generator's .env file."
+        },
+        "datCopilotBridge.modelFamily": {
+          "type": "string",
+          "default": "",
+          "description": "Preferred Copilot model family (e.g. gpt-4o, claude-3.5-sonnet). Leave empty to use whichever model vscode.lm selects by default."
+        },
+        "datCopilotBridge.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start the bridge server when VS Code launches."
+        },
+        "datCopilotBridge.autoQuitOnNodeServerExit": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically quit VS Code once the DAT AI Test Case Generator's Node server (registered via /register-node-port) stops responding — e.g. the user closed the tool's cmd window."
+        },
+        "datCopilotBridge.watchdogIntervalMs": {
+          "type": "number",
+          "default": 5000,
+          "description": "How often (ms) the watchdog checks the Node server's /api/health endpoint."
+        },
+        "datCopilotBridge.watchdogFailureThreshold": {
+          "type": "number",
+          "default": 3,
+          "description": "Number of consecutive failed health checks before the bridge quits VS Code."
+        }
+      }
+    }
+  }
+}

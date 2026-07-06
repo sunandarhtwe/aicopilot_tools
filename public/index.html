@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAT AI Test Case Generator - Copilot Bridge v4.0</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <img src="datlogo.png" alt="DAT" class="brand-logo" />
+        <div>
+          <div class="brand-title" data-i18n="appTitle">AI テストケース ジェネレーター</div>
+          <small>Copilot Bridge v4.0</small>
+        </div>
+      </div>
+      <!-- ① Dashboard nav removed; only Test Case Generation remains -->
+      <nav class="side-nav">
+        <button class="nav-item active" data-view="generate"><span>✣</span><b data-i18n="navGenerate">テストケース生成</b></button>
+      </nav>
+    </aside>
+
+    <section class="main-area">
+      <header class="topbar">
+        <div></div>
+        <div class="top-actions">
+          <div class="lang-toggle" aria-label="Language">
+            <button id="jaBtn" class="active" type="button">日本語</button>
+            <button id="enBtn" type="button">English</button>
+          </div>
+          <!-- ⑥ project-name changed to DAT-SONAR-FR -->
+          <span class="project-name">DAT-SONAR-FR</span>
+          <span class="focus-icon">⛶</span>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- ② generateView is now the only view, starts active -->
+        <section id="generateView" class="view active">
+          <div class="steps">
+            <div class="step active"><b>1</b><span data-i18n="step1">ドキュメントアップロード</span></div><i></i>
+            <div class="step active"><b>2</b><span data-i18n="step2">キーワード入力</span></div><i></i>
+            <div class="step active"><b>3</b><span data-i18n="step3">生成</span></div>
+          </div>
+
+          <div class="generation-layout">
+            <div class="gen-col-left">
+              <div class="work-card upload-only-card">
+                <h2 data-i18n="uploadTitle">設計書をアップロード</h2>
+                <div id="fileList" class="file-list empty"></div>
+                <label class="dropzone" for="documents">
+                  <span class="upload-icon">☁</span>
+                  <strong data-i18n="dropStrong">ここにファイルをドラッグ＆ドロップ</strong>
+                  <em data-i18n="dropEm">またはクリックして選択</em>
+                  <small data-i18n="dropSmall">PDF / Word / Excel / Text</small>
+                </label>
+                <input type="file" id="documents" multiple accept=".pdf,.docx,.xlsx,.xls,.txt,.md,.csv,.pptx,.ppt" />
+
+                <label class="field-label gen-field-spaced" data-i18n="testTypeLabel">テストケース種別</label>
+                <div id="testTypeGroup" class="test-type-group">
+                  <label class="test-type-option">
+                    <input type="radio" name="testType" value="integration" checked />
+                    <span data-i18n="testTypeIntegration">結合テスト (Integration)</span>
+                  </label>
+                  <label class="test-type-option">
+                    <input type="radio" name="testType" value="unit" />
+                    <span data-i18n="testTypeUnit">単体テスト (Unit)</span>
+                  </label>
+                  <label class="test-type-option">
+                    <input type="radio" name="testType" value="comprehensive" />
+                    <span data-i18n="testTypeComprehensive">総合テスト (Comprehensive)</span>
+                  </label>
+                </div>
+
+                <label class="field-label gen-field-spaced"><span data-i18n="keywordLabel">対象機能／キーワード</span> <span>*</span></label>
+                <input id="keyword" class="text-input" value="購入注文" placeholder="例：購入注文、注文取消、ユーザー登録" />
+                <label class="field-label" data-i18n="notesLabel">追加観点（任意）</label>
+                <textarea id="notes" class="text-area" maxlength="500">入力チェック、画面遷移、DB更新、異常系も含めて</textarea>
+                <div class="counter"><span id="count">0</span> / 500</div>
+                <button id="generateBtn" class="primary" data-i18n="generateBtn">✣ テストケースを生成</button>
+                <div id="message" class="message hidden"></div>
+              </div>
+            </div>
+
+            <div class="gen-col-right">
+              <div class="work-card preview-card">
+                <div class="preview-header">
+                  <h2 data-i18n="previewTitle">生成済みテストケース プレビュー</h2>
+                  <div class="preview-actions">
+                    <span id="dirtyBadge" class="dirty-badge hidden" data-i18n="unsavedBadge">未保存の変更</span>
+                    <button id="cancelEditBtn" class="secondary-btn hidden" type="button" data-i18n="cancelBtn">キャンセル</button>
+                    <button id="saveEditBtn" class="secondary-btn hidden" type="button" data-i18n="saveBtn">💾 保存</button>
+                    <a id="downloadBtn" class="download disabled" href="#" data-i18n="downloadBtn">⬇ Excel ダウンロード</a>
+                  </div>
+                </div>
+                <!-- ⑤ contenteditable table wrapper -->
+                <div class="sheet-wrap">
+                  <table class="sheet" id="caseTable">
+                    <tbody id="caseBody">
+                      <tr><td colspan="9" class="placeholder" data-i18n="placeholder">ドキュメントをアップロードして「テストケースを生成」をクリックしてください。</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h2 class="log-title" data-i18n="logTitle">ログ</h2>
+                <div class="log-box"><pre id="log">Ready.</pre></div>
+
+                <div id="coveragePanel" class="execute-placeholder coverage-panel hidden">
+                  <h2 data-i18n="coverageTitle">Coverage Engine</h2>
+                  <div id="coverageCards" class="result-cards"></div>
+                </div>
+
+                <div class="execute-placeholder">
+                  <h2 data-i18n="executeTitle">実行結果（Phase 2 予定）</h2>
+                  <div class="result-cards">
+                    <div><strong>2</strong><span data-i18n="executedSuites">実行済みテストスイート</span></div>
+                    <div><strong>85%</strong><span data-i18n="successRate">成功率</span></div>
+                    <div><strong>Phase 2</strong><span data-i18n="playwrightPlan">Playwright 実行機能を追加予定</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer>© 2026 DAT AI Tool - GitHub Copilot Bridge PoC</footer>
+    </section>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
